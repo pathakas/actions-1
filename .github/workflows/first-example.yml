@@ -13,7 +13,7 @@ jobs:
                 echo "Welcome first Workflow job"
                 ls -lrth
                 cat README.md
-                shell: bash
+              shell: bash
             # - name: list files
             #   run: ls
             # - name: Read file

@@ -13,4 +13,4 @@ jobs:
             - name: list files
               run: ls
             - name: Read file
-              run: bash cat README.md
+              run: /bin/bash cat README.md

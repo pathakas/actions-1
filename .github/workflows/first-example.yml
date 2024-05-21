@@ -9,7 +9,7 @@ jobs:
             - name: Checkout repo
               uses: actions/checkout@v4
             - name: Welcome Message
-              run: bash echo "Welcome first Workflow job"
+              run: echo "Welcome first Workflow job"
             - name: list files
               run: bash ls
             - name: Read file

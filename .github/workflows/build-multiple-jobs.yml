@@ -22,10 +22,10 @@ jobs:
     needs: build_job_1
     runs-on: ubuntu-latest
     steps:
-    - name: Download Artifact
-      uses: actions/download-artifact@v4
-      with:
-        name: my-artifact
+      - name: Download Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: my-artifact
 
       - name: Test File Exists
         run: grep -i "dragon" dragon.txt
@@ -34,11 +34,11 @@ jobs:
     needs: [build_job_1,test_job_2]
     runs-on: ubuntu-latest
     steps:
-    - name: Download Artifact
-      uses: actions/download-artifact@v4
-      with:
-        name: my-artifact
-            
+      - name: Download Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: my-artifact
+
       - name: Read File
         run: cat dragon.txt
             

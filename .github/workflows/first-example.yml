@@ -1,21 +1,32 @@
-name: My First Example
+name: Get PR Comments
 
-on: push
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
 
 jobs:
-    first_job:
-        runs-on: ubuntu-latest
-        steps:
-            - name: Checkout repo
-              uses: actions/checkout@v4
-            - name: Welcome Message
-              run: |
-                echo "Welcome first Workflow job"
-                ls -lrth
-                cat README.md
-              shell: bash
-            # - name: list files
-            #   run: ls
-            # - name: Read file
-            #   run:  cat README.md
-            #   shell: bash
+  get-pr-comments:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Install GitHub CLI
+      run: |
+        sudo apt-get update
+        sudo apt-get install gh
+
+    - name: Authenticate GitHub CLI
+      run: gh auth login --with-token <<< ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Get PR comments
+      id: get_pr_comments
+      run: |
+        PR_NUMBER=${{ github.event.pull_request.number }}
+        COMMENTS=$(gh pr view $PR_NUMBER --comments --json body --jq '.[] | .body' | tr '\n' ' ')
+        echo "PR_COMMENTS=${COMMENTS}" >> $GITHUB_ENV
+
+    - name: Display PR comments
+      run: |
+        echo "The PR comments are: ${{ env.PR_COMMENTS }}"

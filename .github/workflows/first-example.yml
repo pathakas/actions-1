@@ -9,20 +9,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Get PR comments
+    - name: Install GitHub CLI
+      run: |
+        sudo apt-get update
+        sudo apt-get install gh
+
+    - name: Get Public PR comments
       id: get_pr_comments
       run: |
-        # Define variables
+        # Define PR number
         PR_NUMBER=${{ github.event.pull_request.number }}
-        REPO=${{ github.repository }}
-        GITHUB_API_URL="https://api.github.com/repos/${REPO}/issues/${PR_NUMBER}/comments"
-
-        # Fetch PR comments using GitHub API without authentication for public repos
-        response=$(curl -s -H "Accept: application/vnd.github.v3+json" "$GITHUB_API_URL")
-       
-        # Extract comment bodies and concatenate them
-        COMMENTS=$(echo "$response" | jq -r '.[].body' | tr '\n' ' ')
-       
+        
+        # Fetch PR comments using GitHub CLI
+        COMMENTS=$(gh pr view $PR_NUMBER --comments --json body --jq '.[] | .body' | tr '\n' ' ')
+        
         # Output comments
         echo "PR_COMMENTS=${COMMENTS}" >> $GITHUB_ENV
 

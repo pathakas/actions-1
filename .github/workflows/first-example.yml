@@ -1,31 +1,27 @@
-name: Get Public PR Comments
+name: List PR Commits
 
 on:
   pull_request:
-    branches: [ "master" ]
+    types: [opened, synchronize]
 
 jobs:
-  get-pr-comments:
+  list-commits:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Install GitHub CLI
-      run: |
-        sudo apt-get update
-        sudo apt-get install gh
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Get Public PR comments
-      id: get_pr_comments
-      run: |
-        # Define PR number
-        PR_NUMBER=${{ github.event.pull_request.number }}
-        
-        # Fetch PR comments using GitHub CLI
-        COMMENTS=$(gh pr view $PR_NUMBER --comments --json body --jq '.[] | .body' | tr '\n' ' ')
-        
-        # Output comments
-        echo "PR_COMMENTS=${COMMENTS}" >> $GITHUB_ENV
+      - name: List PR commits
+        run: |
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          COMMITS=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/${{ github.repository }}/pulls/$PR_NUMBER/commits")
 
-    - name: Display PR comments
-      run: |
-        echo "The PR comments are: ${{ env.PR_COMMENTS }}"
+          echo "Commits in PR #$PR_NUMBER:"
+          echo "$COMMITS" | jq '.[] | "- \(.commit.message)"'
+
+      - name: Save commits to output
+        id: save-commits
+        run: |
+          echo "::set-output name=commits::$(echo "$COMMITS" | jq -r 'map(.commit.message) | join(", ")')"

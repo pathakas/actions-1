@@ -2,7 +2,7 @@ name: Get Public PR Comments
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
+    branches: [ "master" ]
 
 jobs:
   get-pr-comments:
